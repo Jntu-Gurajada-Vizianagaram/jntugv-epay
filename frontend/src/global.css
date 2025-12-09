@@ -1,0 +1,110 @@
+:root{
+  --primary:#0b5cff;
+  --muted:#6b7280;
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --radius:12px;
+  --container:1100px;
+  --gap:16px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:#0f172a;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+  padding:0;
+}
+
+/* container */
+.container{
+  width:calc(100% - 32px);
+  max-width:var(--container);
+  margin:0 auto;
+  padding:24px;
+}
+
+/* Header */
+.header{
+  background:linear-gradient(90deg,var(--primary),#0051e6);
+  color:white;
+  padding:14px 0;
+  box-shadow:0 1px 6px rgba(2,6,23,0.08);
+}
+.header .bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{font-size:18px;margin:0}
+.brand small{font-size:12px;opacity:0.95}
+
+/* nav */
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{color:white;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:600;font-size:14px}
+.nav a:hover{background:rgba(255,255,255,0.08)}
+
+/* main layout */
+.main{
+  padding:20px 0;
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+}
+
+/* sidebar */
+.sidebar{
+  min-width:220px;
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:12px;
+  box-shadow:0 6px 20px rgba(2,6,23,0.06);
+  height:fit-content;
+}
+.sidebar button{display:block;width:100%;margin-bottom:8px;padding:10px;border-radius:8px;border:0;background:#f3f4f6;text-align:left}
+.sidebar button.active{background:var(--primary);color:white}
+
+/* content card */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:0 6px 20px rgba(2,6,23,0.06);
+}
+
+/* responsive columns */
+.content{
+  flex:1;
+  min-width:0;
+}
+
+/* form styles */
+label{font-weight:600;font-size:13px;color:var(--muted)}
+input[type="text"],input[type="number"],select,input[type="email"]{
+  width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;margin-top:6px;margin-bottom:12px;background:transparent;
+}
+button.primary{background:var(--primary);color:white;padding:10px 14px;border-radius:10px;border:0;font-weight:700}
+.small{font-size:13px;color:var(--muted)}
+
+/* footer */
+footer{margin-top:24px;padding:18px 0;text-align:center;color:var(--muted);font-size:13px}
+
+/* utility */
+.row{display:flex;gap:12px;align-items:center}
+@media(min-width:900px){
+  .container{padding:32px}
+  .sidebar{position:sticky;top:20px}
+}
+
+/* mobile adjustments */
+@media(max-width:700px){
+  .main{flex-direction:column;padding:8px 0}
+  .sidebar{width:100%;display:flex;overflow:auto;gap:8px}
+  .sidebar button{min-width:120px}
+}
