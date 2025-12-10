@@ -1,42 +1,57 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
+// LIVE ENVIRONMENT VERSION — NO /api/system/health endpoint used
 
 export function useSystemHealth() {
-  const [status, setStatus] = useState("OK"); 
-  // OK | OFFLINE | SERVER_DOWN
+  const [status, setStatus] = useState("OK");  
+  // Possible: OK | OFFLINE | SERVER_DOWN
 
   useEffect(() => {
-    function checkOnline() {
+    let isMounted = true;
+
+    async function pingServer() {
       if (!navigator.onLine) {
-        setStatus("OFFLINE");
+        if (isMounted) setStatus("OFFLINE");
         return;
       }
-      testServer();
-    }
 
-    async function testServer() {
       try {
-        // backend lightweight health endpoint
-        const res = await axios.get("/api/system/health", { timeout: 5000 });
-        if (res.data?.status === "OK") setStatus("OK");
+        // Lightweight HEAD request to root domain
+        const res = await fetch("/", {
+          method: "HEAD",
+          cache: "no-store",
+          mode: "no-cors"
+        });
+
+        // If fetch didn't throw, the server is reachable
+        if (isMounted) setStatus("OK");
+
       } catch (err) {
-        setStatus("SERVER_DOWN");
+        if (isMounted) setStatus("SERVER_DOWN");
       }
     }
 
-    // Initial test
-    checkOnline();
+    // Initial check
+    pingServer();
 
-    // Monitor internet changes
-    window.addEventListener("online", checkOnline);
-    window.addEventListener("offline", () => setStatus("OFFLINE"));
+    // Listen to browser online/offline changes
+    function handleOnline() {
+      pingServer();
+    }
+    function handleOffline() {
+      setStatus("OFFLINE");
+    }
 
-    // Recheck server every 20 seconds
-    const interval = setInterval(checkOnline, 20000);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Recheck every 45 seconds (production safe)
+    const interval = setInterval(pingServer, 45000);
 
     return () => {
-      window.removeEventListener("online", checkOnline);
-      window.removeEventListener("offline", checkOnline);
+      isMounted = false;
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
       clearInterval(interval);
     };
   }, []);

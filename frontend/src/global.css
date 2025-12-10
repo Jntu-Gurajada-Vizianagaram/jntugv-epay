@@ -108,3 +108,24 @@ footer{margin-top:24px;padding:18px 0;text-align:center;color:var(--muted);font-
   .sidebar{width:100%;display:flex;overflow:auto;gap:8px}
   .sidebar button{min-width:120px}
 }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.35s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+.animate-fadeInFast {
+  animation: fadeIn 0.15s ease-out;
+}

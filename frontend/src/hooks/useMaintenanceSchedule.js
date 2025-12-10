@@ -1,32 +1,61 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 export function useMaintenanceSchedule() {
   const [locked, setLocked] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    async function checkSchedule() {
-      try {
-        const res = await axios.get("/api/system/maintenance"); 
-        // backend example response:
-        // { active: true, message: "Exam Fee Closed Today 6 PM – 9 PM" }
+    let alive = true;
 
-        if (res.data?.active) {
+    async function checkMaintenance() {
+      try {
+        // Live production request (NO axios, NO mock)
+        const res = await fetch("/api/system/maintenance", {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+          },
+        });
+
+        if (!alive) return;
+
+        // If backend unreachable → DO NOT lock UI
+        if (!res.ok) {
+          console.warn("Maintenance check failed: HTTP", res.status);
+          return;
+        }
+
+        const data = await res.json();
+
+        // Expected live production response:
+        // { active: true/false, message: "System unavailable" }
+        if (data?.active) {
           setLocked(true);
-          setMessage(res.data.message);
+          setMessage(data.message || "Maintenance in progress");
         } else {
           setLocked(false);
+          setMessage("");
         }
-      } catch (e) {
-        // Ignore on failure
+
+      } catch (err) {
+        // Network failures should NOT activate maintenance lock
+        console.warn("Maintenance request error:", err.message);
       }
     }
 
-    checkSchedule();
-    const interval = setInterval(checkSchedule, 30000); // check every 30s
+    // First check immediately
+    checkMaintenance();
 
-    return () => clearInterval(interval);
+    // Production-grade polling: every 5 minutes
+    const interval = setInterval(checkMaintenance, 300000); // 300,000 ms = 5 minutes
+
+    return () => {
+      alive = false;
+      clearInterval(interval);
+    };
+
   }, []);
 
   return { locked, message };

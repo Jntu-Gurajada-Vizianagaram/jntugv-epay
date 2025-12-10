@@ -24,16 +24,20 @@ exports.initiate = async (data) => {
 
   // FIXED URL
   const actionUrl = process.env.SBI_PAYMENT_URL || "http://localhost:4000/api/mock-bank/payment";
+  const callbackUrl = process.env.CALLBACK_URL || "http://localhost:4000/api/pay/callback";
+const returnUrl = process.env.RETURN_URL || "http://localhost:5173/payment/return";
 
   console.log("ACTION URL:", actionUrl);  // Must not be undefined
 
   return {
     action: actionUrl,
     merchantTxnId,
-    fields: {
-      merchantId: process.env.SBI_MERCHANT_ID || "TESTMERCHANT",
-      encRequest: "ENCRYPTED_REQUEST_HERE"
-    }
+   fields: {
+    merchantId: process.env.SBI_MERCHANT_ID || "TESTMERCHANT",
+    encRequest: "ENCRYPTED",
+    callbackUrl,
+    returnUrl
+  }
   };
 };
 

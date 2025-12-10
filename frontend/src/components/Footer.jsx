@@ -2,57 +2,48 @@ import React from "react";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-gray-100 border-t border-gray-300 mt-auto py-4 flex flex-col items-center text-center">
-      
-      {/* Main Footer Content */}
-      <div className="max-w-4xl mx-auto text-center text-sm text-gray-600">
-        © {new Date().getFullYear()} JNTU-GV — Payments Portal
+    <footer className="bg-gray-900 text-gray-300 mt-12 pt-10 pb-6">
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-8">
+
+        {/* UNIVERSITY INFO */}
+        <div>
+          <h3 className="text-lg font-semibold text-white">JNTU-GV</h3>
+          <p className="text-sm mt-2 leading-relaxed">
+            Jawaharlal Nehru Technological University Gurajada, Vizianagaram (JNTU-GV) is committed 
+            to providing secure, transparent and efficient digital financial services through its 
+            Unified Payments Portal, developed in collaboration with the State Bank of India (SBI).
+          </p>
+        </div>
+
+        {/* QUICK LINKS */}
+        <div>
+          <h3 className="text-lg font-semibold text-white">Quick Links</h3>
+          <ul className="mt-2 space-y-2 text-sm">
+            <li><a href="/exam-fee" className="hover:underline">Examination Fees</a></li>
+            <li><a href="/certificates" className="hover:underline">Certificate Services</a></li>
+            <li><a href="/phd-fee" className="hover:underline">Ph.D Scholar Fees</a></li>
+            <li><a href="/affiliation" className="hover:underline">Affiliation Fees</a></li>
+            <li><a href="/challan" className="hover:underline">Direct Challans</a></li>
+            <li><a href="/contact" className="hover:underline">Contact Support</a></li>
+          </ul>
+        </div>
+
+        {/* CONTACT / SUPPORT */}
+        <div>
+          <h3 className="text-lg font-semibold text-white">Support</h3>
+          <p className="text-sm mt-2 leading-relaxed">
+            For payment-related queries or technical issues, please contact the University Finance & 
+            Examination Cell. Ensure that you keep your Transaction ID and Hallticket Number ready 
+            for faster assistance.
+          </p>
+        </div>
       </div>
 
-      {/* Back to Top Button */}
-      <button
-        aria-label="Back to top"
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="
-          mt-3 
-          w-10 h-10 
-          flex items-center justify-center 
-          rounded-full 
-          bg-jntu-500 text-white 
-          shadow-md 
-          hover:bg-jntu-600 
-          transition
-        "
-      >
-        ↑
-      </button>
-
-      {/* Attribution */}
-      <div className="text-xs text-gray-500 mt-3">
-        Built by{" "}
-        <a
-          className="text-jntu-600 font-medium hover:underline"
-          href="https://anilsinthu.vercel.app"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Anil Sinthu
-        </a>{" "}
-        | Source on{" "}
-        <a
-          className="text-jntu-600 font-medium hover:underline"
-          href="https://github.com/anilsinthu114/jntugv-payments"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
-      </div>
-
-      {/* Disclaimer */}
-      <div className="text-[11px] text-gray-400 mt-2 px-4 leading-snug max-w-lg">
-        This is a student project for educational purposes only. Not affiliated with JNTU-GV.
-        Use at your own risk.
+      <div className="border-t border-gray-700 mt-8 pt-4 text-center text-xs text-gray-400">
+        © {new Date().getFullYear()} Jawaharlal Nehru Technological University Gurajada, Vizianagaram.
+        All Rights Reserved.
+        <br />
+        Unified Payments Portal | Joint Collaboration with the State Bank of India (SBI)
       </div>
     </footer>
   );

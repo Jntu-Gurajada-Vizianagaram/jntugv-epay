@@ -1,8 +1,8 @@
+// const axios = require("axios");
 import axios from "axios";
-
 export async function initiatePayment(payload) {
   const res = await axios.post("/api/pay/initiate", payload);
-  return res.data; // { action, fields, merchantTxnId }
+  return res.data;
 }
 
 export async function getPaymentStatus(merchantTxnId) {
