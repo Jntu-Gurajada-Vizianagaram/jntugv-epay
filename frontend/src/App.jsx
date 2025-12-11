@@ -7,7 +7,7 @@ import { PortalLayout } from "./layouts/PortalLayout";
 
 // Pages
 import { Home } from "./pages/Home";
-import { PaymentReturn } from "./pages/paymentReturn";
+import { PaymentReturn } from "./pages/PaymentReturn";
 import { Success } from "./pages/Success";
 import { ErrorPage } from "./pages/ErrorPage";
 import { ExamFeeForm } from "./pages/forms/ExamFeeForm";
