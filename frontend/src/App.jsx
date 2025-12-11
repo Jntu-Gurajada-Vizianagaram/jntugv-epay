@@ -19,6 +19,11 @@ import { ChallanForm } from "./pages/forms/ChallanForm";
 import { PhDFeeForm } from "./pages/forms/PhDFeeForm";
 import { PageDisabled } from "./pages/PageDisabled";
 import { NotFound } from "./pages/NotFound";
+import { ContactUs } from "./pages/ContactUs";
+import { AboutUs } from "./pages/AboutUs";
+import { FAQ } from "./pages/FAQ";
+import { TermsAndConditions } from "./pages/TermsAndConditions";
+import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 
 // System / Status pages
 import { ServerError } from "./pages/ServerError";
@@ -54,7 +59,7 @@ export default function App() {
   if (maintenance) {
     return <PortalLockout title="Scheduled Maintenance" message="The portal is currently undergoing scheduled maintenance. Please check back later." />;
   }
-  
+
   if (maintenance) return <Maintenance503 />;
 
   // Normal portal routes
@@ -71,6 +76,11 @@ export default function App() {
         <Route path="/affiliation" element={<AffiliationForm />} />
         <Route path="/challan" element={<ChallanForm />} />
         <Route path="/phd-fee" element={<PhDFeeForm />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         {/* Payments */}
         <Route path="/payment/return" element={<PaymentReturn />} />

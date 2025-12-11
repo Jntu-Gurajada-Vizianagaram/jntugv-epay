@@ -1,28 +1,47 @@
 import React from "react";
 import { Header } from "../components/Header";
-// import { Sidebar } from "../components/SideBar";
 import { Footer } from "../components/Footer";
 
 export function PortalLayout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex gap-6">
-        <div className="hidden md:block md:flex-shrink-0">
-          {/* <Sidebar /> */}
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
 
-        <div className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Top tiles area for quick access (desktop only duplicates sidebar) */}
-            <div className="md:col-span-3">
+      {/* --- Sticky Header --- */}
+      <Header />
+
+      {/* --- Main Container --- */}
+      <main className="flex-1 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex gap-6">
+
+          {/* OPTIONAL SIDEBAR (hidden for now) */}
+          {/* <aside className="hidden md:block w-64">
+            <Sidebar />
+          </aside> */}
+
+          {/* MAIN CONTENT AREA */}
+          <section className="flex-1">
+
+            {/* PAGE WRAPPER WITH POLISHED LOOK */}
+            <div
+              className="
+                bg-white 
+                shadow-sm 
+                rounded-xl 
+                border border-gray-200 
+                p-6 
+                mb-10 
+                transition-all 
+                duration-200
+              "
+            >
               {children}
             </div>
-          </div>
 
-          <Footer />
+            {/* FOOTER ALWAYS AT BOTTOM */}
+            <Footer />
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

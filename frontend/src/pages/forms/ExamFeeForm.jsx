@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Input } from "../../components/Input";
+import { Select } from "../../components/Select";
+import { Button } from "../../components/Button";
 import { isValidHTNo } from "../../utils/validations";
 import { parseHTNumber } from "../../utils/htParser";
 import { initiatePayment } from "../../api/paymentApi";
@@ -7,80 +9,203 @@ import { initiatePayment } from "../../api/paymentApi";
 export function ExamFeeForm() {
   const [ht, setHt] = useState("");
   const [name, setName] = useState("");
+  const [examType, setExamType] = useState("REGULAR");
   const [amount, setAmount] = useState("");
+  const [parsedInfo, setParsedInfo] = useState(null);
+
+  const [processing, setProcessing] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
+
   const formRef = useRef(null);
 
+  // Auto-submit SBI form
   useEffect(() => {
     if (paymentData && formRef.current) formRef.current.submit();
   }, [paymentData]);
+
+  /* ------------------------------
+      Exam Fee Mapping (Customizable)
+     ------------------------------ */
+  const feeChart = {
+    REGULAR: 750,
+    SUPPLEMENTARY: 360,
+    REVALUATION: 1000,
+    RC: 300,
+    SHORT_MEMO: 50,
+    SPECIAL_SUPPLY: 950,
+  };
+
+  const examDescriptions = {
+    REGULAR: "Regular Semester Examination Fee for registered subjects.",
+    SUPPLEMENTARY: "Supplementary Fee for backlog subjects.",
+    REVALUATION: "Apply for revaluation of answer scripts.",
+    RC: "Request for Recounting of marks.",
+    SHORT_MEMO: "Short Memo / Marks Extract Fee.",
+    SPECIAL_SUPPLY: "Special Supplementary Examination Fee.",
+  };
+
+  // Auto parse HT Number
+  useEffect(() => {
+    if (isValidHTNo(ht)) {
+      const parsed = parseHTNumber(ht);
+      setParsedInfo(parsed.valid ? parsed : null);
+    } else {
+      setParsedInfo(null);
+    }
+  }, [ht]);
+
+  // Auto update fee when exam type changes
+  useEffect(() => {
+    setAmount(feeChart[examType]);
+  }, [examType]);
 
   async function submit(e) {
     e.preventDefault();
 
     if (!isValidHTNo(ht)) return alert("Invalid Hallticket format");
-
-    const parsed = parseHTNumber(ht);
-    if (!parsed.valid) return alert("Hallticket parsing failed!");
+    if (!parsedInfo?.valid) return alert("Unable to parse Hallticket");
+    if (!name.trim()) return alert("Name is required");
 
     const payload = {
       student_roll: ht,
       student_name: name,
       amount: Number(amount),
 
-      // enriched academic metadata
-      year: parsed.year,
-      college_code: parsed.collegeCode,
-      college_name: parsed.college,
-      branch_code: parsed.branchCode,
-      branch_name: parsed.branch,
-      course: parsed.course,
-      roll_number: parsed.roll,
+      // metadata from parsed HT No
+      year: parsedInfo.year,
+      college_code: parsedInfo.collegeCode,
+      college_name: parsedInfo.college,
+      branch_code: parsedInfo.branchCode,
+      branch_name: parsedInfo.branch,
+      course: parsedInfo.course,
+      roll_number: parsedInfo.roll,
 
-      // payment info
       payment_type: "EXAM_FEE",
-      payment_category: "EXAMINATION",
+      payment_subtype: examType,
+      payment_category: "UNIVERSITY_EXAMINATION",
+      remarks: `${examType} Examination Fee`,
     };
 
-    const res = await initiatePayment(payload);
-    setPaymentData(res);
+    try {
+      setProcessing(true);
+      const res = await initiatePayment(payload);
+      setPaymentData(res);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to initiate payment");
+    } finally {
+      setProcessing(false);
+    }
   }
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow max-w-xl mx-auto">
+    <div className="max-w-2xl mx-auto p-5">
 
-      <h2 className="text-xl font-semibold mb-4 text-jntu-700">
-        Examination Fee Payment
-      </h2>
+      {/* HEADER */}
+      <div className="bg-blue-600 text-white p-5 rounded-xl shadow-md mb-6">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          📝 Examination Fee Payment
+        </h2>
+        <p className="text-sm mt-1 opacity-90">
+          Pay semester examination fees, supplementary, revaluation & more.
+        </p>
+      </div>
 
-      <form onSubmit={submit} className="space-y-4">
-        <Input
-          label="Hallticket Number"
-          value={ht}
-          onChange={(e) => setHt(e.target.value.toUpperCase())}
-          required
-        />
+      {/* INSTRUCTIONS */}
+      <div className="bg-white p-5 rounded-xl shadow border border-gray-200 mb-6">
+        <h3 className="text-lg font-semibold mb-2 text-gray-900">Important Information</h3>
 
-        <Input
-          label="Student Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <ul className="list-disc pl-5 text-sm text-gray-800 space-y-1">
+          <li>Enter your hallticket number exactly as per university records.</li>
+          <li>Select the correct examination type before proceeding.</li>
+          <li>Fees are based on university circulars — automatically updated.</li>
+          <li>Multiple subjects in supplementary exams require *per-subject* fee payment.</li>
+        </ul>
 
-        <Input
-          label="Amount (INR)"
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
+        <div className="text-xs text-red-600 mt-3">
+          ⚠ Incorrect details may lead to rejection of exam registration.
+        </div>
+      </div>
 
-        <button className="primary w-full" type="submit">
-          Proceed to Pay
-        </button>
-      </form>
+      {/* MAIN FORM */}
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
 
-      {/* Auto-submit form to SBI */}
+        <form onSubmit={submit} className="space-y-4">
+
+          {/* HT No */}
+          <Input
+            label="Hallticket Number"
+            placeholder="22XX1A1234"
+            value={ht}
+            onChange={(e) => setHt(e.target.value.toUpperCase())}
+            required
+          />
+
+          {/* LIVE PARSED INFO */}
+          {parsedInfo && (
+            <div className="bg-green-50 border border-green-200 p-3 rounded text-sm text-green-900">
+              <div className="font-medium mb-1">Verified Student Info</div>
+              <div>College: {parsedInfo.college}</div>
+              <div>Branch: {parsedInfo.branch}</div>
+              <div>Course: {parsedInfo.course}</div>
+              <div>Year / Roll: {parsedInfo.year} / {parsedInfo.roll}</div>
+            </div>
+          )}
+
+          {/* Student Name */}
+          <Input
+            label="Student Name"
+            placeholder="Enter full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+
+          {/* Exam Type */}
+          <Select
+            label="Examination Type"
+            value={examType}
+            onChange={(e) => setExamType(e.target.value)}
+            required
+            options={[
+              { value: "REGULAR", label: "Regular Examination" },
+              { value: "SUPPLEMENTARY", label: "Supplementary" },
+              { value: "REVALUATION", label: "Revaluation" },
+              { value: "RC", label: "Recounting (RC)" },
+              { value: "SHORT_MEMO", label: "Short Memo" },
+              { value: "SPECIAL_SUPPLY", label: "Special Supplementary" },
+            ]}
+          />
+
+          {/* Exam Description */}
+          <div className="bg-gray-50 border border-gray-200 p-3 rounded text-sm text-gray-800">
+            <strong>About:</strong> {examDescriptions[examType]}
+          </div>
+
+          {/* Amount */}
+          <Input
+            label="Fee Amount (INR)"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+          />
+
+          {/* Payment Summary */}
+          <div className="bg-blue-50 border border-blue-200 p-3 rounded text-sm text-blue-900">
+            <div className="font-medium">Payment Summary</div>
+            <div className="mt-1">Exam Type: {examType}</div>
+            <div>Fee: ₹{amount}</div>
+          </div>
+
+          {/* Submit */}
+          <Button className="w-full mt-4" disabled={processing}>
+            {processing ? "Processing..." : "Proceed to Secure Payment →"}
+          </Button>
+        </form>
+      </div>
+
+      {/* SBI Hidden Form */}
       {paymentData && (
         <form
           ref={formRef}

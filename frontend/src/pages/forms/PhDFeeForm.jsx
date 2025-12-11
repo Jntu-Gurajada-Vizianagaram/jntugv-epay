@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
+import { Select } from "../../components/Select";
 import { initiatePayment } from "../../api/paymentApi";
 
 export function PhDFeeForm() {
@@ -8,17 +11,47 @@ export function PhDFeeForm() {
   const [feeType, setFeeType] = useState("");
   const [amount, setAmount] = useState("");
 
+  const [processing, setProcessing] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
+
   const formRef = useRef(null);
 
+  const feeDescriptions = {
+    ADMISSION: "Initial admission fee at the time of joining Ph.D.",
+    TUITION: "Semester/Yearly research tuition fee.",
+    EXAMINATION: "Ph.D. course work or semester exam fee.",
+    PROGRESS_SEMINAR: "Fee for conducting progress seminar presentations.",
+    THESIS_SUBMISSION: "Fee for submitting full Ph.D. thesis.",
+    RESUBMISSION: "Fee for re-submitting revised thesis.",
+    VIVA_VOCE: "Fee for Ph.D. Viva-Voce and evaluation.",
+    LATE_FEE: "Penalty/late fee for delay in academic procedures.",
+    OTHERS: "Other misc. payments approved by the University.",
+  };
+
+  const departmentsList = [
+    "CSE",
+    "ECE",
+    "EEE",
+    "ME",
+    "CE",
+    "Chem",
+    "Maths",
+    "Physics",
+    "Chemistry",
+    "Management",
+  ];
+
+  // Auto-submit SBI Form
   useEffect(() => {
     if (paymentData && formRef.current) formRef.current.submit();
   }, [paymentData]);
 
   async function submit(e) {
     e.preventDefault();
+
     if (!regNo.trim()) return alert("Registration Number is required.");
     if (!feeType) return alert("Please select fee type.");
+    if (!amount) return alert("Amount must not be empty.");
 
     const payload = {
       student_roll: regNo,
@@ -26,108 +59,133 @@ export function PhDFeeForm() {
       department,
       fee_type: feeType,
       amount: Number(amount),
-      payment_category: "PHD_FEE"
+      payment_category: "PHD_FEE",
+      remarks: `PhD - ${feeType}`,
     };
 
-    const resp = await initiatePayment(payload);
-    setPaymentData(resp);
+    try {
+      setProcessing(true);
+      const resp = await initiatePayment(payload);
+      setPaymentData(resp);
+    } catch (err) {
+      alert("Failed to initiate payment");
+      console.error(err);
+    } finally {
+      setProcessing(false);
+    }
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow">
-      <h2 className="text-xl font-semibold mb-3 text-jntu-700">
-        Ph.D. Scholars Fee Payment
-      </h2>
+    <div className="max-w-2xl mx-auto p-4">
 
-      <form onSubmit={submit} className="space-y-4">
+      {/* HEADER */}
+      <div className="bg-purple-700 text-white p-6 rounded-xl shadow-lg mb-6">
+        <h2 className="text-xl font-semibold flex items-center gap-2">
+          🎓 Ph.D. Scholar Fee Payment
+        </h2>
+        <p className="text-sm opacity-90 mt-1">
+          Secure online fee payment portal for research scholars of JNTU-GV.
+        </p>
+      </div>
 
-        {/* Registration Number */}
-        <div>
-          <label className="text-sm font-medium">Ph.D. Registration Number</label>
-          <input
+      {/* INFO CARD */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow p-5 mb-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Instructions</h3>
+        <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+          <li>Enter your official Ph.D. registration number.</li>
+          <li>Select correct department and fee type.</li>
+          <li>Payment details will be stored and verified by the Research Cell.</li>
+          <li>Ensure the amount corresponds to the latest circular.</li>
+        </ul>
+
+        <div className="text-xs text-red-600 mt-3 border-t pt-2">
+          ⚠ Incorrect details may delay academic processing.
+        </div>
+      </div>
+
+      {/* FORM */}
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <form onSubmit={submit} className="space-y-4">
+
+          {/* Registration Number */}
+          <Input
+            label="Ph.D Registration Number"
+            placeholder="e.g., PHD20CSE001"
             value={regNo}
             onChange={(e) => setRegNo(e.target.value.toUpperCase())}
-            className="mt-1 w-full p-2 border rounded-lg"
-            placeholder="e.g., PHD20CSE001"
             required
           />
-        </div>
 
-        {/* Name */}
-        <div>
-          <label className="text-sm font-medium">Scholar Name</label>
-          <input
+          {/* Scholar Name */}
+          <Input
+            label="Scholar Name"
+            placeholder="Enter full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full p-2 border rounded-lg"
-            placeholder="Enter scholar full name"
           />
-        </div>
 
-        {/* Department */}
-        <div>
-          <label className="text-sm font-medium">Department</label>
-          <select
+          {/* Department */}
+          <Select
+            label="Department"
+            required
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="mt-1 w-full p-2 border rounded-lg"
-            required
-          >
-            <option value="">Select Department</option>
-            <option value="CSE">Computer Science and Engineering</option>
-            <option value="ECE">Electronics and Communication Engineering</option>
-            <option value="EEE">Electrical and Electronics Engineering</option>
-            <option value="ME">Mechanical Engineering</option>
-            <option value="CE">Civil Engineering</option>
-            <option value="Chem">Chemical Engineering</option>
-            <option value="Maths">Mathematics</option>
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Management">Management Studies</option>
-          </select>
-        </div>
+            options={[
+              { value: "", label: "Select Department" },
+              ...departmentsList.map((d) => ({ value: d, label: d })),
+            ]}
+          />
 
-        {/* Fee Type */}
-        <div>
-          <label className="text-sm font-medium">Fee Type</label>
-          <select
+          {/* Fee Type */}
+          <Select
+            label="Fee Type"
+            required
             value={feeType}
             onChange={(e) => setFeeType(e.target.value)}
-            className="mt-1 w-full p-2 border rounded-lg"
-            required
-          >
-            <option value="">Select Fee Type</option>
-            <option value="ADMISSION">Admission Fee</option>
-            <option value="TUITION">Tuition Fee (Yearly/Semester)</option>
-            <option value="EXAMINATION">Examination Fee</option>
-            <option value="PROGRESS_SEMINAR">Progress Seminar Fee</option>
-            <option value="THESIS_SUBMISSION">Thesis Submission Fee</option>
-            <option value="RESUBMISSION">Thesis Re-submission Fee</option>
-            <option value="VIVA_VOCE">Viva Voce Fee</option>
-            <option value="LATE_FEE">Late Fee / Penalty</option>
-            <option value="OTHERS">Other Payments</option>
-          </select>
-        </div>
+            options={[
+              { value: "", label: "Select Fee Type" },
+              ...Object.keys(feeDescriptions).map((d) => ({
+                value: d,
+                label: d.replace(/_/g, " "),
+              })),
+            ]}
+          />
 
-        {/* Amount */}
-        <div>
-          <label className="text-sm font-medium">Amount (INR)</label>
-          <input
+          {/* Description */}
+          {feeType && (
+            <div className="bg-purple-50 border border-purple-200 text-purple-900 p-3 rounded-lg text-sm">
+              <strong>Description:</strong>
+              <p>{feeDescriptions[feeType]}</p>
+            </div>
+          )}
+
+          {/* Amount */}
+          <Input
+            label="Fee Amount (INR)"
             type="number"
+            placeholder="Enter amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="mt-1 w-full p-2 border rounded-lg"
-            placeholder="Enter amount"
             required
           />
-        </div>
 
-        <button className="bg-jntu-500 text-white px-4 py-2 rounded-lg font-semibold w-full">
-          Pay Now
-        </button>
-      </form>
+          {/* Summary */}
+          {(feeType && amount) && (
+            <div className="bg-blue-50 border border-blue-200 p-3 rounded text-sm text-blue-900">
+              <strong>Payment Summary</strong>
+              <p className="mt-1">Fee Type: {feeType.replace(/_/g, " ")}</p>
+              <p>Amount: ₹{amount}</p>
+              {department && <p>Department: {department}</p>}
+            </div>
+          )}
 
-      {/* Auto-submit SBI Form */}
+          <Button disabled={processing} className="w-full mt-4">
+            {processing ? "Processing..." : "Proceed to Payment →"}
+          </Button>
+        </form>
+      </div>
+
+      {/* Auto Submit SBI Form */}
       {paymentData && (
         <form
           ref={formRef}

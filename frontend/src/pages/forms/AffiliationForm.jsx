@@ -1,20 +1,121 @@
-import React,{useState,useRef,useEffect} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Input } from "../../components/Input";
+import { Select } from "../../components/Select";
+import { Button } from "../../components/Button";
 import { initiatePayment } from "../../api/paymentApi";
 
-export function AffiliationForm(){
-  const [code,setCode]=useState(''); const [name,setName]=useState(''); const [amount,setAmount]=useState('');
-  const [paymentData,setPaymentData]=useState(null); const formRef=useRef(null);
-  useEffect(()=>{ if(paymentData && formRef.current) formRef.current.submit(); },[paymentData]);
-  async function submit(e){ e.preventDefault(); const res = await initiatePayment({ student_roll:code, student_name:name, amount:Number(amount), payment_type:'AFFILIATION', remarks:'Affiliation Fee' }); setPaymentData(res); }
-  return(<div>
-    <h2>Affiliation</h2>
-    <form onSubmit={submit}>
-      <Input label="College Code" value={code} onChange={e=>setCode(e.target.value)} />
-      <Input label="College Name" value={name} onChange={e=>setName(e.target.value)} />
-      <Input label="Amount (INR)" type="number" value={amount} onChange={e=>setAmount(e.target.value)} required />
-      <button className="primary" type="submit">Pay</button>
-    </form>
-    {paymentData && <form ref={formRef} method="POST" action={paymentData.action} style={{display:'none'}}>{Object.entries(paymentData.fields).map(([k,v])=> <input key={k} type="hidden" name={k} value={v} />)}</form>}
-  </div>);
+export function AffiliationForm() {
+  const [code, setCode] = useState("");
+  const [collegeName, setCollegeName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("AFFILIATION_GENERAL");
+
+  const [paymentData, setPaymentData] = useState(null);
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    if (paymentData && formRef.current) {
+      formRef.current.submit();
+    }
+  }, [paymentData]);
+
+  async function submit(e) {
+    e.preventDefault();
+
+    if (!code || code.length < 3) {
+      return alert("Please enter a valid college code.");
+    }
+
+    if (!collegeName.trim()) {
+      return alert("College name is required.");
+    }
+
+    const payload = {
+      student_roll: code,
+      student_name: collegeName,
+      amount: Number(amount),
+      payment_type: "AFFILIATION",
+      payment_subtype: category,
+      remarks: `Affiliation Fee - ${collegeName} (${code})`,
+    };
+
+    const res = await initiatePayment(payload);
+    setPaymentData(res);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto mt-6">
+
+      {/* PAGE TITLE */}
+      <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+        College Affiliation Fee Payment
+      </h2>
+      <p className="text-gray-600 text-sm mb-6">
+        Colleges affiliated with <strong>JNTU-GV</strong> can pay annual affiliation fees securely through this portal.
+      </p>
+
+      {/* FORM CARD */}
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+
+        <form onSubmit={submit}>
+
+          <Input
+            label="College Code"
+            placeholder="Enter college code (e.g., GV01)"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            required
+          />
+
+          <Input
+            label="College Name"
+            placeholder="Enter official college name"
+            value={collegeName}
+            onChange={(e) => setCollegeName(e.target.value)}
+            required
+          />
+
+          <Select
+            label="Affiliation Category"
+            required
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            options={[
+              { value: "AFFILIATION_GENERAL", label: "General Affiliation Fee" },
+              { value: "AFFILIATION_RENEWAL", label: "Renewal of Affiliation" },
+              { value: "AFFILIATION_INSPECTION", label: "Inspection Charges" },
+              { value: "AFFILIATION_SPECIAL", label: "Special Permission Fee" },
+            ]}
+          />
+
+          <Input
+            label="Amount (INR)"
+            type="number"
+            placeholder="Enter payable fee"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+          />
+
+          <Button type="submit" className="mt-3">
+            Proceed to Payment
+          </Button>
+        </form>
+      </div>
+
+      {/* AUTO-SUBMIT SBI FORM */}
+      {paymentData && (
+        <form
+          ref={formRef}
+          method="POST"
+          action={paymentData.action}
+          style={{ display: "none" }}
+        >
+          {Object.entries(paymentData.fields).map(([k, v]) => (
+            <input key={k} type="hidden" name={k} value={v} />
+          ))}
+        </form>
+      )}
+    </div>
+  );
 }
