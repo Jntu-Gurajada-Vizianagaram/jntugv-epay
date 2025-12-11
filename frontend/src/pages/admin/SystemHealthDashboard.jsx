@@ -20,7 +20,7 @@ export function SystemHealthDashboard() {
     }
 
     fetchHealth();
-    const interval = setInterval(fetchHealth, 15000); // 15s
+    const interval = setInterval(fetchHealth, 60000); // 60s
 
     return () => clearInterval(interval);
   }, []);
