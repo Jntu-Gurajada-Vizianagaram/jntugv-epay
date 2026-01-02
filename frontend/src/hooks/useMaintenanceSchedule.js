@@ -10,9 +10,9 @@ export function useMaintenanceSchedule() {
     async function checkMaintenance() {
       try {
         // Live production request (NO axios, NO mock)
-        const res = await fetch("/api/system/maintenance", {
+        const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+        const res = await fetch(`${baseUrl}/api/system/maintenance`, {
           method: "GET",
-          cache: "no-store",
           headers: {
             "Pragma": "no-cache",
             "Cache-Control": "no-cache, no-store, must-revalidate",

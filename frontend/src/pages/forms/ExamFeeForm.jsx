@@ -9,6 +9,10 @@ import { initiatePayment } from "../../api/paymentApi";
 export function ExamFeeForm() {
   const [ht, setHt] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [manualYear, setManualYear] = useState("I");
+  const [manualSem, setManualSem] = useState("I");
   const [examType, setExamType] = useState("REGULAR");
   const [amount, setAmount] = useState("");
   const [parsedInfo, setParsedInfo] = useState(null);
@@ -63,22 +67,27 @@ export function ExamFeeForm() {
     e.preventDefault();
 
     if (!isValidHTNo(ht)) return alert("Invalid Hallticket format");
-    if (!parsedInfo?.valid) return alert("Unable to parse Hallticket");
+    if (!isValidHTNo(ht)) return alert("Invalid Hallticket format");
+    // Parsed info is now for display/verification only, not blocking.
     if (!name.trim()) return alert("Name is required");
 
     const payload = {
       student_roll: ht,
       student_name: name,
+      email: email,
+      mobile: mobile,
       amount: Number(amount),
 
       // metadata from parsed HT No
-      year: parsedInfo.year,
-      college_code: parsedInfo.collegeCode,
-      college_name: parsedInfo.college,
-      branch_code: parsedInfo.branchCode,
-      branch_name: parsedInfo.branch,
-      course: parsedInfo.course,
-      roll_number: parsedInfo.roll,
+      // metadata
+      year: manualYear, // User manually selected year
+      semester: manualSem, // User manually selected semester
+      college_code: parsedInfo?.collegeCode || "UNKNOWN",
+      college_name: parsedInfo?.college || "UNKNOWN",
+      branch_code: parsedInfo?.branchCode || "UNKNOWN",
+      branch_name: parsedInfo?.branch || "UNKNOWN",
+      course: parsedInfo?.course || "UNKNOWN",
+      roll_number: parsedInfo?.roll || "UNKNOWN",
 
       payment_type: "EXAM_FEE",
       payment_subtype: examType,
@@ -148,7 +157,7 @@ export function ExamFeeForm() {
               <div>College: {parsedInfo.college}</div>
               <div>Branch: {parsedInfo.branch}</div>
               <div>Course: {parsedInfo.course}</div>
-              <div>Year / Roll: {parsedInfo.year} / {parsedInfo.roll}</div>
+              <div>Admitted Batch: 20{parsedInfo.year}</div>
             </div>
           )}
 
@@ -160,6 +169,53 @@ export function ExamFeeForm() {
             onChange={(e) => setName(e.target.value)}
             required
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="student@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Mobile Number"
+              type="tel"
+              placeholder="9876543210"
+              value={mobile}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setMobile(val);
+              }}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Present Year"
+              value={manualYear}
+              onChange={(e) => setManualYear(e.target.value)}
+              required
+              options={[
+                { value: "I", label: "I Year" },
+                { value: "II", label: "II Year" },
+                { value: "III", label: "III Year" },
+                { value: "IV", label: "IV Year" },
+              ]}
+            />
+            <Select
+              label="Present Semester"
+              value={manualSem}
+              onChange={(e) => setManualSem(e.target.value)}
+              required
+              options={[
+                { value: "I", label: "I Semester" },
+                { value: "II", label: "II Semester" },
+              ]}
+            />
+          </div>
 
           {/* Exam Type */}
           <Select

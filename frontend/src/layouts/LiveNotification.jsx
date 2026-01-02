@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { apiClient } from "../api/paymentApi";
 
 export function LiveNotification() {
   const [notif, setNotif] = useState(null);
@@ -7,12 +7,12 @@ export function LiveNotification() {
   useEffect(() => {
     async function check() {
       try {
-        const res = await axios.get("/api/system/notifications");
+        const res = await apiClient.get("/api/system/notifications");
         if (res.data?.message) {
           setNotif(res.data.message);
           setTimeout(() => setNotif(null), 6000);
         }
-      } catch {}
+      } catch { }
     }
 
     const interval = setInterval(check, 15000);

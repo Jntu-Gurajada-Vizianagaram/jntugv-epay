@@ -13,7 +13,16 @@ const mockBankRoutes = require("./src/routes/mockBank");
 const app = express();
 
 // Security
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"], // Scripts are self-only (we removed inline)
+      formAction: ["'self'", "http://localhost:5173", "https://pay.jntugv.edu.in"], // Allow POST to frontend
+      connectSrc: ["'self'", "http://localhost:4000", "http://localhost:5173"],
+    }
+  }
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
@@ -21,7 +30,7 @@ app.use(morgan("dev"));
 // API Routes
 app.use("/api/pay", paymentRoutes);
 app.use("/api/system", systemRoutes);
-// app.use("/api/mock-bank", mockBankRoutes);
+app.use("/api/mock-bank", mockBankRoutes);
 
 // Root
 app.get("/", (req, res) => {

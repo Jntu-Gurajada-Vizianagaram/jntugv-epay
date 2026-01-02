@@ -8,6 +8,8 @@ import { initiatePayment } from "../../api/paymentApi";
 export function CertificatesForm() {
   const [ht, setHt] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [cert, setCert] = useState("OD");
   const [amount, setAmount] = useState("");
 
@@ -49,6 +51,8 @@ export function CertificatesForm() {
     const res = await initiatePayment({
       student_roll: ht,
       student_name: name,
+      email: email,
+      mobile: mobile,
       amount: Number(amount),
       payment_type: "CERTIFICATE",
       payment_subtype: cert,
@@ -86,7 +90,7 @@ export function CertificatesForm() {
         </ul>
 
         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-900">
-          ⚠️ <strong>Important Notice:</strong>  
+          ⚠️ <strong>Important Notice:</strong>
           Tatkal / Express certificate services are <strong>permanently discontinued</strong> by JNTU-GV administration.
         </div>
 
@@ -138,6 +142,25 @@ export function CertificatesForm() {
             onChange={(e) => setName(e.target.value)}
             required
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="student@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Contact Mobile"
+              type="tel"
+              placeholder="9876543210"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              required
+            />
+          </div>
 
           {/* Amount */}
           <Input

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { initiatePayment } from "../api/paymentApi";
 
 export function PaymentPage() {
   const [roll, setRoll] = useState("");
@@ -16,16 +16,16 @@ export function PaymentPage() {
     }
   }, [paymentData]);
 
-  async function initiatePayment(e) {
+  async function handlePayment(e) {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/pay/initiate", {
+      const res = await initiatePayment({
         student_roll: roll,
         student_name: name,
         amount: Number(amount),
       });
 
-      setPaymentData(res.data); // trigger auto-submit via useEffect
+      setPaymentData(res); // trigger auto-submit via useEffect
     } catch (err) {
       console.error(err);
       alert("Payment initiation failed.");
@@ -37,23 +37,23 @@ export function PaymentPage() {
       <h2 style={{ marginBottom: 8 }}>JNTUGV Payment</h2>
 
       {/* ---------- USER INPUT FORM ---------- */}
-      <form onSubmit={initiatePayment}>
-        <label>Roll Number</label><br/>
+      <form onSubmit={handlePayment}>
+        <label>Roll Number</label><br />
         <input
           value={roll}
           onChange={e => setRoll(e.target.value)}
           required
           style={{ width: "100%" }}
-        /><br/><br/>
+        /><br /><br />
 
-        <label>Name</label><br/>
+        <label>Name</label><br />
         <input
           value={name}
           onChange={e => setName(e.target.value)}
           style={{ width: "100%" }}
-        /><br/><br/>
+        /><br /><br />
 
-        <label>Amount (INR)</label><br/>
+        <label>Amount (INR)</label><br />
         <input
           value={amount}
           onChange={e => setAmount(e.target.value)}
@@ -61,7 +61,7 @@ export function PaymentPage() {
           type="number"
           step="0.01"
           style={{ width: "100%" }}
-        /><br/><br/>
+        /><br /><br />
 
         <button type="submit">Pay Now</button>
       </form>

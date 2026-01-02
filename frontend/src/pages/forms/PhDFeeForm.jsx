@@ -3,10 +3,13 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Select } from "../../components/Select";
 import { initiatePayment } from "../../api/paymentApi";
+import { parseHTNumber } from "../../utils/htParser";
 
 export function PhDFeeForm() {
   const [regNo, setRegNo] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [department, setDepartment] = useState("");
   const [feeType, setFeeType] = useState("");
   const [amount, setAmount] = useState("");
@@ -50,12 +53,22 @@ export function PhDFeeForm() {
     e.preventDefault();
 
     if (!regNo.trim()) return alert("Registration Number is required.");
+
+    // Strict Ph.D Validation
+    const parsed = parseHTNumber(regNo);
+    if (!parsed.valid) return alert("Invalid Registration Number.");
+    if (parsed.course !== "Ph.D Program") {
+      return alert(`This portal is for Ph.D. Scholars only. Your ID indicates: ${parsed.course}`);
+    }
+
     if (!feeType) return alert("Please select fee type.");
     if (!amount) return alert("Amount must not be empty.");
 
     const payload = {
       student_roll: regNo,
       student_name: name,
+      email: email,
+      mobile: mobile,
       department,
       fee_type: feeType,
       amount: Number(amount),
@@ -123,6 +136,25 @@ export function PhDFeeForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="scholar@jntugv.edu.in"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Contact Mobile"
+              type="tel"
+              placeholder="9876543210"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              required
+            />
+          </div>
 
           {/* Department */}
           <Select

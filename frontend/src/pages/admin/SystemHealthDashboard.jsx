@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { apiClient } from "../../api/paymentApi";
 
 export function SystemHealthDashboard() {
   const [health, setHealth] = useState({
@@ -12,7 +12,7 @@ export function SystemHealthDashboard() {
   useEffect(() => {
     async function fetchHealth() {
       try {
-        const res = await axios.get("/api/system/health-full");
+        const res = await apiClient.get("/api/system/health-full");
         setHealth(res.data);
       } catch (e) {
         setHealth((prev) => ({ ...prev, backend: "DOWN" }));
@@ -29,8 +29,8 @@ export function SystemHealthDashboard() {
     return status === "OK"
       ? "text-green-600"
       : status === "DOWN"
-      ? "text-red-600"
-      : "text-gray-500";
+        ? "text-red-600"
+        : "text-gray-500";
   };
 
   return (

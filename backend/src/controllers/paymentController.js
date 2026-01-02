@@ -126,6 +126,7 @@ const paymentService = require("../services/paymentService");
 
 exports.initiatePayment = async (req, res) => {
   try {
+    console.log("INITIATE PAYLOAD:", req.body);
     const data = await paymentService.initiate(req.body);
     res.json(data);
   } catch (err) {

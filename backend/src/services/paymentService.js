@@ -9,6 +9,8 @@ exports.initiate = async (data) => {
     merchantTxnId,
     student_roll: data.student_roll,
     student_name: data.student_name,
+    email: data.email,
+    mobile: data.mobile,
     year: data.year,
     college_code: data.college_code,
     college_name: data.college_name,
@@ -23,21 +25,32 @@ exports.initiate = async (data) => {
   });
 
   // FIXED URL
-  const actionUrl = process.env.SBI_PAYMENT_URL || "http://localhost:4000/api/mock-bank/payment";
-  const callbackUrl = process.env.CALLBACK_URL || "http://localhost:4000/api/pay/callback";
-const returnUrl = process.env.RETURN_URL || "http://localhost:5173/payment/return";
+  const cleanUrl = (url) => (url ? url.replace(/\/$/, "") : "");
+
+  let actionUrl = cleanUrl(process.env.SBI_PAYMENT_URL);
+
+  // Guard against infinite loop misconfiguration (if actionUrl points to /api/pay/initiate)
+  if (!actionUrl || actionUrl.includes("/api/pay/initiate")) {
+    console.warn("WARNING: SBI_PAYMENT_URL is misconfigured (points to itself). Using Mock Bank.");
+    actionUrl = "http://localhost:4000/api/mock-bank/payment";
+  }
+
+  const callbackUrl = cleanUrl(process.env.CALLBACK_URL) || "http://localhost:4000/api/pay/callback";
+  const returnUrl = cleanUrl(process.env.RETURN_URL) || "http://localhost:5173/payment/return";
 
   console.log("ACTION URL:", actionUrl);  // Must not be undefined
 
   return {
     action: actionUrl,
     merchantTxnId,
-   fields: {
-    merchantId: process.env.SBI_MERCHANT_ID || "TESTMERCHANT",
-    encRequest: "ENCRYPTED",
-    callbackUrl,
-    returnUrl
-  }
+    fields: {
+      merchantId: process.env.SBI_MERCHANT_ID || "TESTMERCHANT",
+      encRequest: "ENCRYPTED",
+      merchantTxnId, // Pass this so mock bank knows the ref
+      amount: String(data.amount), // Pass amount for display
+      callbackUrl,
+      returnUrl
+    }
   };
 };
 

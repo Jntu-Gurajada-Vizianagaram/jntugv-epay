@@ -14,6 +14,8 @@ import { initiatePayment } from "../../api/paymentApi";
  */
 export function ChallanForm() {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [purpose, setPurpose] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("GENERAL");
@@ -73,6 +75,8 @@ export function ChallanForm() {
       const payload = {
         student_roll: "CHALLAN",
         student_name: name,
+        email: email,
+        mobile: mobile,
         amount: Number(amount),
         payment_type: "CHALLAN",
         payment_subtype: category,
@@ -122,6 +126,25 @@ export function ChallanForm() {
             required
           />
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="payer@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Contact Mobile"
+              type="tel"
+              placeholder="9876543210"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              required
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Purpose (select or type)</label>
 
@@ -131,9 +154,8 @@ export function ChallanForm() {
                   type="button"
                   key={p}
                   onClick={() => applyPreset(p)}
-                  className={`text-sm px-3 py-1 rounded-full border ${
-                    purpose === p ? "bg-blue-600 text-white border-blue-600" : "bg-gray-50 text-gray-800 border-gray-200"
-                  } transition`}
+                  className={`text-sm px-3 py-1 rounded-full border ${purpose === p ? "bg-blue-600 text-white border-blue-600" : "bg-gray-50 text-gray-800 border-gray-200"
+                    } transition`}
                 >
                   {p}
                 </button>

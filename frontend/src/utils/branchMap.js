@@ -18,6 +18,15 @@ export const BRANCH_MAP = {
   "M02": "M.Tech in Thermal Engineering",
   "M03": "M.Tech in Power Systems",
   "M04": "M.Tech in VLSI Design",
+  "MET": "Metallurgical Engineering",
+  "MG": "Management (MBA)",
+  "0MG": "Management (MBA)",
+  "00": "B.Pharmacy",
+  "1R": "B.Pharmacy",
+  "1T": "Pharm.D",
+  "1S": "M.Pharmacy",
+  "1E": "MBA",
+  "1F": "MCA"
 
 };
 
@@ -30,7 +39,7 @@ export const SPECIALIZATION_MAP = {
   "CE": "Communication Engineering",
   "R": "Robotics",
   "EM": "Embedded Systems",
-  // Add more specializations here...
+
 };
 
 export function detectSpecialization(branchCode) {

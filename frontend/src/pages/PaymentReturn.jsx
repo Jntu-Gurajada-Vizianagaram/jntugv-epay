@@ -9,10 +9,15 @@ export function PaymentReturn() {
   useEffect(() => {
     (async () => {
       try {
-        // read posted form fields from bank return
         const fd = new FormData(document.forms[0] || undefined);
         const obj = {};
         for (const [k, v] of fd.entries()) obj[k] = v;
+
+        // If empty, try URL Query Params (GET) - fixes Vite dev server 404
+        if (Object.keys(obj).length === 0) {
+          const urlParams = new URLSearchParams(window.location.search);
+          for (const [k, v] of urlParams.entries()) obj[k] = v;
+        }
 
         const merchantTxnId = obj.merchantTxnId || obj.orderId || obj.merchant_txn_id;
         if (!merchantTxnId) {
@@ -21,8 +26,11 @@ export function PaymentReturn() {
           return;
         }
 
+        console.log("Verifying Transaction ID:", merchantTxnId);
         setMsg("Verifying with server...");
         const resp = await getPaymentStatus(merchantTxnId);
+        console.log("Verification Response:", resp);
+
         if (resp.status === "SUCCESS") {
           setMsg("Payment successful");
           setTimeout(() => navigate("/payment/success"), 1000);
@@ -33,9 +41,9 @@ export function PaymentReturn() {
           setMsg("Pending settlement. Please wait.");
         }
       } catch (e) {
-        console.error(e);
-        setMsg("Verification failed");
-        setTimeout(() => navigate("/payment/error"), 1600);
+        console.error("Verification Error:", e);
+        setMsg(`Verification failed: ${e.message}`);
+        setTimeout(() => navigate("/payment/error"), 3000); // Increased timeout to read msg
       }
     })();
   }, [navigate]);

@@ -30,11 +30,11 @@ import { ServerError } from "./pages/ServerError";
 import { Maintenance500 } from "./pages/system/Maintenance500";
 import { ServerDown } from "./pages/system/ServerDown";
 import { PortalLockout } from "./pages/system/PortalLockout";
-import { Offline } from "./pages/system/Offline"; // ✅ adjust path if different
+import { Offline } from "./pages/system/Offline";
 
 // Hooks
 import { useMaintenanceSchedule } from "./hooks/useMaintenanceSchedule";
-import { useSystemHealth } from "./hooks/useSystemHealth"; // ✅ adjust path if different
+import { useSystemHealth } from "./hooks/useSystemHealth";
 
 export default function App() {
   const system = useSystemHealth();

@@ -7,6 +7,8 @@ import { initiatePayment } from "../../api/paymentApi";
 export function AffiliationForm() {
   const [code, setCode] = useState("");
   const [collegeName, setCollegeName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("AFFILIATION_GENERAL");
 
@@ -22,8 +24,8 @@ export function AffiliationForm() {
   async function submit(e) {
     e.preventDefault();
 
-    if (!code || code.length < 3) {
-      return alert("Please enter a valid college code.");
+    if (!code || code.length < 2) {
+      return alert("Please enter a valid college code (Min 2 chars).");
     }
 
     if (!collegeName.trim()) {
@@ -33,6 +35,8 @@ export function AffiliationForm() {
     const payload = {
       student_roll: code,
       student_name: collegeName,
+      email: email,
+      mobile: mobile,
       amount: Number(amount),
       payment_type: "AFFILIATION",
       payment_subtype: category,
@@ -74,6 +78,25 @@ export function AffiliationForm() {
             onChange={(e) => setCollegeName(e.target.value)}
             required
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="college@jntugv.edu.in"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              label="Contact Mobile"
+              type="tel"
+              placeholder="9876543210"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              required
+            />
+          </div>
 
           <Select
             label="Affiliation Category"
