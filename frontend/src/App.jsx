@@ -35,6 +35,7 @@ import { Offline } from "./pages/system/Offline";
 // Hooks
 import { useMaintenanceSchedule } from "./hooks/useMaintenanceSchedule";
 import { useSystemHealth } from "./hooks/useSystemHealth";
+import { Maintenance503 } from "./pages/system/Maintenance503";
 
 export default function App() {
   const system = useSystemHealth();

@@ -18,7 +18,7 @@ exports.getMaintenanceStatus = (req, res) => {
 };
 
 exports.getLiveNotification = (req, res) => {
-  res.json({ message: null }); // Provide dynamic notification here
+  res.json({ message: null });
 };
 
 exports.fullHealthStatus = (req, res) => {
