@@ -28,9 +28,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // API Routes
-app.use("/api/pay", paymentRoutes);
+// API Routes
+app.use("/api/payment", paymentRoutes);
 app.use("/api/system", systemRoutes);
 app.use("/api/mock-bank", mockBankRoutes);
+
+
 
 // Root
 app.get("/", (req, res) => {

@@ -8,6 +8,11 @@ import { initiatePayment } from "../../api/paymentApi";
 export function CertificatesForm() {
   const [ht, setHt] = useState("");
   const [name, setName] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [studyStatus, setStudyStatus] = useState("COMPLETED");
+  const [collegeCode, setCollegeCode] = useState("");
+  const [collegeName, setCollegeName] = useState("");
+  const [approvalRef, setApprovalRef] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [cert, setCert] = useState("OD");
@@ -51,10 +56,16 @@ export function CertificatesForm() {
     const res = await initiatePayment({
       student_roll: ht,
       student_name: name,
+      father_name: fatherName,
+      study_status: studyStatus,
+      college_code: collegeCode,
+      college_name: collegeName,
+      approval_letter_ref: approvalRef,
       email: email,
       mobile: mobile,
       amount: Number(amount),
       payment_type: "CERTIFICATE",
+      payment_category: "CERTIFICATE", // Explicit category
       payment_subtype: cert,
       remarks: `${cert} Certificate Fee`,
     });
@@ -141,6 +152,52 @@ export function CertificatesForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+          />
+
+          {/* Core Student Details */}
+          <Input
+            label="Father Name (As per SSC)"
+            placeholder="Father Name"
+            value={fatherName}
+            onChange={(e) => setFatherName(e.target.value)}
+            required
+          />
+
+          <Select
+            label="Study Status"
+            value={studyStatus}
+            onChange={(e) => setStudyStatus(e.target.value)}
+            required
+            options={[
+              { value: "COMPLETED", label: "Completed" },
+              { value: "PURSUING", label: "Pursuing" },
+              { value: "DISCONTINUED", label: "Discontinued" },
+            ]}
+          />
+
+          {/* College Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="College Code"
+              placeholder="Ex: VV"
+              value={collegeCode}
+              onChange={(e) => setCollegeCode(e.target.value.toUpperCase())}
+              required
+            />
+            <Input
+              label="College Name"
+              placeholder="College Name"
+              value={collegeName}
+              onChange={(e) => setCollegeName(e.target.value)}
+              required
+            />
+          </div>
+
+          <Input
+            label="University Approval Letter Ref (If any)"
+            placeholder="Letter No/Ref ID for special requests"
+            value={approvalRef}
+            onChange={(e) => setApprovalRef(e.target.value)}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

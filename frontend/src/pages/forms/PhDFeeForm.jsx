@@ -8,6 +8,8 @@ import { parseHTNumber } from "../../utils/htParser";
 export function PhDFeeForm() {
   const [regNo, setRegNo] = useState("");
   const [name, setName] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [studyStatus, setStudyStatus] = useState("PURSUING");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [department, setDepartment] = useState("");
@@ -67,6 +69,8 @@ export function PhDFeeForm() {
     const payload = {
       student_roll: regNo,
       student_name: name,
+      father_name: fatherName,
+      study_status: studyStatus,
       email: email,
       mobile: mobile,
       department,
@@ -136,6 +140,27 @@ export function PhDFeeForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Father Name"
+              placeholder="Father's Name"
+              value={fatherName}
+              onChange={(e) => setFatherName(e.target.value)}
+              required
+            />
+            <Select
+              label="Study Status"
+              value={studyStatus}
+              onChange={(e) => setStudyStatus(e.target.value)}
+              required
+              options={[
+                { value: "PURSUING", label: "Pursuing" },
+                { value: "COMPLETED", label: "Completed" },
+                { value: "DISCONTINUED", label: "Discontinued" },
+              ]}
+            />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input

@@ -4,8 +4,6 @@ exports.processMockPayment = async (req, res) => {
   try {
     const { merchantId, callbackUrl, returnUrl, merchantTxnId, amount } = req.body;
     const effectiveTxnId = merchantTxnId || "MOCK-" + Date.now();
-
-    // Render an HTML payment page
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -109,6 +107,7 @@ exports.confirmMockPayment = async (req, res) => {
             <input type="hidden" name="merchantTxnId" value="${merchantTxnId}" />
             <input type="hidden" name="bankTxnId" value="${bankTxnId}" />
             <input type="hidden" name="status" value="${status}" />
+            <input type="hidden" name="amount" value="${payload.amount}" />
             <input type="hidden" name="responseCode" value="${payload.responseCode}" />
             <button type="submit">Return to Merchant</button>
           </form>

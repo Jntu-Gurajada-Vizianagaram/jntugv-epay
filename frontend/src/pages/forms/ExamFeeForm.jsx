@@ -9,6 +9,8 @@ import { initiatePayment } from "../../api/paymentApi";
 export function ExamFeeForm() {
   const [ht, setHt] = useState("");
   const [name, setName] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [studyStatus, setStudyStatus] = useState("PURSUING");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [manualYear, setManualYear] = useState("I");
@@ -74,6 +76,8 @@ export function ExamFeeForm() {
     const payload = {
       student_roll: ht,
       student_name: name,
+      father_name: fatherName,
+      study_status: studyStatus,
       email: email,
       mobile: mobile,
       amount: Number(amount),
@@ -168,6 +172,26 @@ export function ExamFeeForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+          />
+
+          <Input
+            label="Father Name"
+            placeholder="Enter father's name"
+            value={fatherName}
+            onChange={(e) => setFatherName(e.target.value)}
+            required
+          />
+
+          <Select
+            label="Study Status"
+            value={studyStatus}
+            onChange={(e) => setStudyStatus(e.target.value)}
+            required
+            options={[
+              { value: "PURSUING", label: "Pursuing" },
+              { value: "COMPLETED", label: "Completed" },
+              { value: "DISCONTINUED", label: "Discontinued" },
+            ]}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

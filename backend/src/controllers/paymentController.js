@@ -154,3 +154,17 @@ exports.getPaymentStatus = async (req, res) => {
     res.status(500).json({ error: "Unable to fetch status" });
   }
 };
+
+const { decryptData } = require("../utils/secureUrl");
+
+exports.decryptPaymentData = async (req, res) => {
+  try {
+    const { data } = req.body;
+    if (!data) return res.status(400).json({ error: "Missing data" });
+    const decrypted = decryptData(data);
+    res.json(decrypted);
+  } catch (err) {
+    console.error("Decryption Error", err);
+    res.status(400).json({ error: "Invalid data" });
+  }
+};

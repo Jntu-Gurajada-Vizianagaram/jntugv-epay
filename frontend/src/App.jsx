@@ -86,6 +86,7 @@ export default function App() {
         {/* Payments */}
         <Route path="/payment/return" element={<PaymentReturn />} />
         <Route path="/payment/success" element={<Success />} />
+        <Route path="/success" element={<Success />} />
         <Route path="/payment/error" element={<ErrorPage />} />
 
         {/* System pages */}

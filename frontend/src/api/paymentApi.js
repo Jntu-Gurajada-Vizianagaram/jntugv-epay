@@ -12,17 +12,22 @@ export const apiClient = axios.create({
 });
 
 export async function initiatePayment(payload) {
-  const res = await apiClient.post("/api/pay/initiate", payload);
+  const res = await apiClient.post("/api/payment/initiate", payload);
   return res.data;
 }
 
 export async function getPaymentStatus(merchantTxnId) {
-  const res = await apiClient.get(`/api/pay/payment-response/${merchantTxnId}`);
+  const res = await apiClient.get(`/api/payment/payment-response/${merchantTxnId}`);
   return res.data;
 }
 
 export async function mockBankCallback(callbackData) {
-  const res = await apiClient.post("/api/pay/callback", callbackData);
+  const res = await apiClient.post("/api/payment/callback", callbackData);
+  return res.data;
+}
+
+export async function decryptPaymentData(encryptedString) {
+  const res = await apiClient.post("/api/payment/decrypt", { data: encryptedString });
   return res.data;
 }
 
