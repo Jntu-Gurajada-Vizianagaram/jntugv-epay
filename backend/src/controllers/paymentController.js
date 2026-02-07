@@ -124,13 +124,35 @@
 
 const paymentService = require("../services/paymentService");
 
+const { PaymentInitiateSchema } = require("../validators/paymentValidator");
+
 exports.initiatePayment = async (req, res) => {
   try {
-    console.log("INITIATE PAYLOAD:", req.body);
-    const data = await paymentService.initiate(req.body);
+    const validatedData = PaymentInitiateSchema.parse(req.body);
+    console.log("INITIATE PAYLOAD:", validatedData);
+    const data = await paymentService.initiate(validatedData);
     res.json(data);
   } catch (err) {
+    if (err.name === 'ZodError') {
+      return res.status(400).json({ error: "Validation Error", details: err.errors });
+    }
     console.error("Initiate Payment Error", err);
+    res.status(500).json({ error: "Failed to initiate payment" });
+  }
+};
+
+exports.initiatePaymentView = async (req, res) => {
+  try {
+    console.log("INITIATE (GET) PAYLOAD:", req.query);
+    // Treat GET params as the payload
+    const validatedData = PaymentInitiateSchema.parse(req.query);
+    const data = await paymentService.initiate(validatedData);
+    res.json(data);
+  } catch (err) {
+    if (err.name === 'ZodError') {
+      return res.status(400).json({ error: "Validation Error", details: err.errors });
+    }
+    console.error("Initiate Payment (GET) Error", err);
     res.status(500).json({ error: "Failed to initiate payment" });
   }
 };

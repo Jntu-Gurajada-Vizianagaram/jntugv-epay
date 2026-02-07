@@ -5,6 +5,7 @@ const paymentController = require("../controllers/paymentController");
 const { encryptData } = require("../utils/secureUrl");
 
 router.post("/initiate", paymentController.initiatePayment);
+router.get("/initiate", paymentController.initiatePaymentView);
 router.post("/callback", paymentController.callbackHandler);
 router.post("/sbipush-response", paymentController.callbackHandler);
 router.get("/status/:merchantTxnId", paymentController.getPaymentStatus);
