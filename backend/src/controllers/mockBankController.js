@@ -2,7 +2,7 @@ const axios = require("axios");
 
 exports.processMockPayment = async (req, res) => {
   try {
-    const { merchantId, callbackUrl, returnUrl, merchantTxnId, amount } = req.body;
+    const { merchantId, callbackUrl, returnUrl, merchantTxnId, amount, customerName, customerEmail, customerMobile } = req.body;
     const effectiveTxnId = merchantTxnId || "MOCK-" + Date.now();
     res.send(`
       <!DOCTYPE html>
@@ -27,6 +27,11 @@ exports.processMockPayment = async (req, res) => {
         <div class="card">
           <h2>🏦 Mock Bank Gateway</h2>
           
+          <div class="row">
+            <label>Customer</label>
+            <div class="value">${customerName || "N/A"}</div>
+            <div style="font-size: 0.8rem; color: #666">${customerEmail || ""} | ${customerMobile || ""}</div>
+          </div>
           <div class="row">
             <label>Merchant</label>
             <div class="value">${merchantId}</div>

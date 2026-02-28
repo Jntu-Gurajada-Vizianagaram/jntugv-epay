@@ -17,8 +17,8 @@ const params = {
     course: "B.Tech",
     branch_code: "05",
     branch_name: "CSE",
-    college_code: "J4",
-    college_name: "JNTU-GV College of Engineering"
+    college_code: "VV",
+    college_name: "JNTU-GV College of Engineering Vizianagaram (A)"
 };
 
 async function testInitiate() {

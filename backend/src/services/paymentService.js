@@ -1,9 +1,10 @@
 const db = require("../models");
 const Payment = db.Payment;
+const { SBIEPayClient } = require("epay_nodejs_sdk");
 
 exports.initiate = async (data) => {
 
-  const merchantTxnId = "JNTUGV-" + Date.now();
+  const merchantTxnId = "JNTUGV" + Date.now();
 
   /* Create Base Payment Record */
   const payment = await Payment.create({
@@ -78,32 +79,68 @@ exports.initiate = async (data) => {
   // FIXED URL
   const cleanUrl = (url) => (url ? url.replace(/\/$/, "") : "");
 
-  let actionUrl = cleanUrl(process.env.SBI_PAYMENT_URL);
-
-  // Guard against infinite loop misconfiguration (if actionUrl points to /api/payment/initiate)
-  if (!actionUrl || actionUrl.includes("/api/payment/initiate")) {
-    console.warn("WARNING: SBI_PAYMENT_URL is misconfigured (points to itself). Using Mock Bank.");
-    actionUrl = `${process.env.API_URL}/api/mock-bank/payment`;
-  }
-
   // SBI_PUSH_URL is the official term for the server-to-server callback
   const callbackUrl = cleanUrl(process.env.SBI_PUSH_URL) || cleanUrl(process.env.CALLBACK_URL) || `${process.env.API_URL}/api/payment/callback`;
   const returnUrl = cleanUrl(process.env.RETURN_URL) || `${process.env.API_URL}/api/payment/return`;
 
-  console.log("ACTION URL:", actionUrl);
+  try {
+    const sbiePayClient = new SBIEPayClient({
+      apiKey: process.env.SBI_MERCHANT_ID,
+      apiSecret: process.env.SBI_MERCHANT_KEY,
+      encryptionKey: process.env.SBI_ENCRYPTION_KEY_BASE64
+    }, 'SANDBOX', true);
 
-  return {
-    action: actionUrl,
-    merchantTxnId,
-    fields: {
-      merchantId: process.env.SBI_MERCHANT_ID || "TESTMERCHANT",
-      encRequest: "ENCRYPTED",
-      merchantTxnId,
-      amount: String(data.amount),
-      callbackUrl,
-      returnUrl
+    const orderPayload = {
+      orderAmount: data.amount,
+      currencyCode: 'INR',
+      orderRefNumber: merchantTxnId, // Must be alphanumeric, JNTUGV-time
+      returnUrl: returnUrl
+    };
+
+    console.log("CREATING ORDER:", orderPayload);
+    const apiResponse = await sbiePayClient.order.create(orderPayload);
+
+    if (apiResponse.status === 1 && apiResponse.data && apiResponse.data.length > 0) {
+      const orderData = apiResponse.data[0];
+      console.log("ORDER CREATED:", orderData.transactionUrl);
+
+      return {
+        action: orderData.transactionUrl,
+        method: "GET",
+        merchantTxnId,
+        fields: {}
+      };
+    } else {
+      console.error("SBI API Error:", JSON.stringify(apiResponse.errors));
+      throw new Error("Failed to create SBI ePay Order");
     }
-  };
+
+  } catch (error) {
+    console.warn("WARNING: SDK call failed or misconfigured. Falling back to mock bank or throwing error.", error.message);
+
+    // Fallback to Mock Bank behavior if SDK not fully configured or fails
+    let actionUrl = cleanUrl(process.env.SBI_PAYMENT_URL) || `${process.env.API_URL}/api/mock-bank/payment`;
+    if (actionUrl.includes("sbiepay.sbiuat.bank.in")) {
+      actionUrl = `${process.env.API_URL}/api/mock-bank/payment`;
+    }
+
+    return {
+      action: actionUrl,
+      method: "POST",
+      merchantTxnId,
+      fields: {
+        merchantId: process.env.SBI_MERCHANT_ID,
+        encRequest: process.env.SBI_ENCRYPTION_KEY_BASE64,
+        merchantTxnId,
+        amount: String(data.amount),
+        customerName: data.student_name || data.college_name,
+        customerMobile: data.mobile,
+        customerEmail: data.email,
+        callbackUrl,
+        returnUrl
+      }
+    };
+  }
 };
 
 exports.callback = async (body) => {

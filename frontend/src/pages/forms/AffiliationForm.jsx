@@ -130,7 +130,7 @@ export function AffiliationForm() {
       {paymentData && (
         <form
           ref={formRef}
-          method="POST"
+          method={paymentData.method || "POST"}
           action={paymentData.action}
           style={{ display: "none" }}
         >

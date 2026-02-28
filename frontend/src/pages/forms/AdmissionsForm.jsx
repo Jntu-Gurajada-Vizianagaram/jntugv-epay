@@ -152,7 +152,7 @@ export function AdmissionsForm() {
               <option>Pharm D</option>
               <option>OTHER</option>
 
-              
+
             </select>
           </div>
 
@@ -178,7 +178,7 @@ export function AdmissionsForm() {
               <option>MBA</option>
               <option>MCA</option>
               <option>PHARMA</option>
-              
+
               <option>AIML</option>
               <option>OTHER</option>
             </select>
@@ -225,7 +225,7 @@ export function AdmissionsForm() {
       {paymentData && (
         <form
           ref={formRef}
-          method="POST"
+          method={paymentData.method || "POST"}
           action={paymentData.action}
           style={{ display: "none" }}
         >

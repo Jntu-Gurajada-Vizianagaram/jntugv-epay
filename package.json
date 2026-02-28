@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",
+    "epay_nodejs_sdk": "file:backend/lib/epay_nodejs_sdk-1.0.0.tgz",
     "zod": "^4.3.6"
   }
 }

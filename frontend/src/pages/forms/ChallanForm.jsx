@@ -232,7 +232,7 @@ export function ChallanForm() {
 
       {/* Hidden bank form (auto-post) */}
       {paymentData && (
-        <form ref={formRef} method="POST" action={paymentData.action} style={{ display: "none" }}>
+        <form ref={formRef} method={paymentData.method || "POST"} action={paymentData.action} style={{ display: "none" }}>
           {Object.entries(paymentData.fields).map(([k, v]) => (
             <input key={k} type="hidden" name={k} value={v} />
           ))}

@@ -41,7 +41,7 @@ export function HostelsForm() {
         <Input label="Amount (INR)" type="number" value={amount} onChange={e => setAmount(e.target.value)} required />
         <button className="primary" type="submit">Pay</button>
       </form>
-      {paymentData && <form ref={formRef} method="POST" action={paymentData.action} style={{ display: 'none' }}>{Object.entries(paymentData.fields).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}</form>}
+      {paymentData && <form ref={formRef} method={paymentData.method || "POST"} action={paymentData.action} style={{ display: 'none' }}>{Object.entries(paymentData.fields).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}</form>}
     </div>
   );
 }
