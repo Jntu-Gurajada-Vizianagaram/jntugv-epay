@@ -9,6 +9,7 @@ import { PortalLayout } from "./layouts/PortalLayout";
 import { Home } from "./pages/Home";
 import { PaymentReturn } from "./pages/PaymentReturn";
 import { Success } from "./pages/Success";
+import { Failure } from "./pages/Failure";
 import { ErrorPage } from "./pages/ErrorPage";
 import { ExamFeeForm } from "./pages/forms/ExamFeeForm";
 import { CertificatesForm } from "./pages/forms/CertificatesForm";
@@ -87,6 +88,8 @@ export default function App() {
         <Route path="/payment/return" element={<PaymentReturn />} />
         <Route path="/payment/success" element={<Success />} />
         <Route path="/success" element={<Success />} />
+        <Route path="/payment/failure" element={<Failure />} />
+        <Route path="/failure" element={<Failure />} />
         <Route path="/payment/error" element={<ErrorPage />} />
 
         {/* System pages */}

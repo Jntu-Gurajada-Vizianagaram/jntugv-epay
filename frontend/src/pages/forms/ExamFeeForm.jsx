@@ -26,7 +26,15 @@ export function ExamFeeForm() {
 
   // Auto-submit SBI form
   useEffect(() => {
-    if (paymentData && formRef.current) formRef.current.submit();
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        // Direct redirect for SbiePay generated tokens so we don't mangle the URL
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        // Fallback or old POST based integration
+        formRef.current.submit();
+      }
+    }
   }, [paymentData]);
 
   /* ------------------------------
@@ -69,9 +77,11 @@ export function ExamFeeForm() {
     e.preventDefault();
 
     if (!isValidHTNo(ht)) return alert("Invalid Hallticket format");
-    if (!isValidHTNo(ht)) return alert("Invalid Hallticket format");
     // Parsed info is now for display/verification only, not blocking.
     if (!name.trim()) return alert("Name is required");
+    if (mobile && mobile.length !== 10) return alert("Mobile number must be exactly 10 digits");
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Invalid email format");
+    if (!amount || Number(amount) <= 0) return alert("Valid fee amount is required");
 
     const payload = {
       student_roll: ht,

@@ -22,7 +22,13 @@ export function AdmissionsForm() {
 
   // Auto-submit to bank
   useEffect(() => {
-    if (paymentData && formRef.current) formRef.current.submit();
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        formRef.current.submit();
+      }
+    }
   }, [paymentData]);
 
   // Handle changes

@@ -18,8 +18,15 @@ router.get("/return", (req, res) => {
     // Encrypt the query parameters to hide them from URL history
     const encrypted = encryptData(req.query);
 
-    // Redirect with single 'data' param
-    res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
+    // Check status provided by the SBI ePay redirect query parameters
+    const statusStr = (req.query.status || "").toUpperCase();
+    const isFailed = statusStr === "FAIL" || statusStr === "FAILED";
+
+    if (isFailed) {
+        res.redirect(`${frontendBase}/payment/failure?data=${encrypted}`);
+    } else {
+        res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
+    }
 });
 
 router.get("/payment-response/:merchantTxnId", paymentController.getPaymentStatus);

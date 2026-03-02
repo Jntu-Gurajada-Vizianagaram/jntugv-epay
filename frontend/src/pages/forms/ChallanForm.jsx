@@ -33,7 +33,13 @@ export function ChallanForm() {
 
   // Auto submit to bank when paymentData arrives
   useEffect(() => {
-    if (paymentData && formRef.current) formRef.current.submit();
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        formRef.current.submit();
+      }
+    }
   }, [paymentData]);
 
   const purposePresets = [

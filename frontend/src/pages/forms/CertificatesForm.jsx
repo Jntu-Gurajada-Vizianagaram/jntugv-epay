@@ -39,7 +39,13 @@ export function CertificatesForm() {
 
   // Auto-submit form to bank
   useEffect(() => {
-    if (paymentData && formRef.current) formRef.current.submit();
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        formRef.current.submit();
+      }
+    }
   }, [paymentData]);
 
   // Update amount automatically
@@ -52,6 +58,9 @@ export function CertificatesForm() {
 
     if (!isValidHTNo(ht)) return alert("Invalid Hallticket Number");
     if (!name.trim()) return alert("Name is required");
+    if (mobile && mobile.length !== 10) return alert("Mobile number must be exactly 10 digits");
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Invalid email format");
+    if (!amount || Number(amount) <= 0) return alert("Valid fee amount is required");
 
     const res = await initiatePayment({
       student_roll: ht,

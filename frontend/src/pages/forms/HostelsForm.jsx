@@ -12,7 +12,15 @@ export function HostelsForm() {
   const [amount, setAmount] = useState('');
   const [paymentData, setPaymentData] = useState(null); const formRef = useRef(null);
 
-  useEffect(() => { if (paymentData && formRef.current) formRef.current.submit(); }, [paymentData]);
+  useEffect(() => {
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        formRef.current.submit();
+      }
+    }
+  }, [paymentData]);
 
   async function submit(e) {
     e.preventDefault();

@@ -16,8 +16,12 @@ export function AffiliationForm() {
   const formRef = useRef(null);
 
   useEffect(() => {
-    if (paymentData && formRef.current) {
-      formRef.current.submit();
+    if (paymentData) {
+      if (paymentData.method === "GET") {
+        window.location.href = paymentData.action;
+      } else if (formRef.current) {
+        formRef.current.submit();
+      }
     }
   }, [paymentData]);
 

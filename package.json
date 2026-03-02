@@ -11,6 +11,7 @@
     "start": "npm --prefix backend start"
   },
   "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.1.4",
     "concurrently": "^8.2.2"
   },
   "dependencies": {
