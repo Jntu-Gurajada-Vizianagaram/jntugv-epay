@@ -11,23 +11,8 @@ router.post("/sbipush-response", paymentController.callbackHandler);
 router.get("/status/:merchantTxnId", paymentController.getPaymentStatus);
 router.post("/decrypt", paymentController.decryptPaymentData);
 
-// Handle browser return by redirecting to frontend with encrypted data
-router.get("/return", (req, res) => {
-    const frontendBase = process.env.APP_BASE_URL || "http://localhost:5173";
-
-    // Encrypt the query parameters to hide them from URL history
-    const encrypted = encryptData(req.query);
-
-    // Check status provided by the SBI ePay redirect query parameters
-    const statusStr = (req.query.status || "").toUpperCase();
-    const isFailed = statusStr === "FAIL" || statusStr === "FAILED";
-
-    if (isFailed) {
-        res.redirect(`${frontendBase}/payment/failure?data=${encrypted}`);
-    } else {
-        res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
-    }
-});
+// Handle browser return by redirecting to frontend
+router.get("/return", paymentController.clientReturnHandler);
 
 router.get("/payment-response/:merchantTxnId", paymentController.getPaymentStatus);
 

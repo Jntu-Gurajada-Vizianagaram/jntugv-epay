@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { decryptPaymentData } from "../api/paymentApi";
 
 export function Failure() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -58,7 +59,14 @@ export function Failure() {
                 </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800">Payment Failed</h2>
-            <p className="text-gray-500 mt-2">The transaction was declined or cancelled.</p>
+            <p className="text-gray-500 mt-2">
+                {status?.toUpperCase() === "ABORT" || status?.toUpperCase() === "ABORTED"
+                    ? "The transaction was declined or cancelled by the user."
+                    : "The transaction was failed or declined."}
+            </p>
+            <p className="text-sm font-medium text-red-700 bg-red-50 p-3 rounded-lg mt-4 border border-red-100">
+                If your account was debited, the amount will be refunded to your original payment method as per your bank's rules.
+            </p>
 
             <div className="mt-6 border-t border-gray-100 pt-4 text-left space-y-2">
                 <div className="flex justify-between">
@@ -77,7 +85,7 @@ export function Failure() {
 
             <div className="mt-8">
                 <button
-                    onClick={() => window.history.back()}
+                    onClick={() => navigate("/")}
                     className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
                 >
                     Try Again

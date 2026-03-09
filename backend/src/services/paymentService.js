@@ -119,7 +119,7 @@ exports.initiate = async (data) => {
     console.warn("WARNING: SDK call failed or misconfigured. Falling back to mock bank or throwing error.", error.message);
 
     // Fallback to Mock Bank behavior if SDK not fully configured or fails
-    let actionUrl = cleanUrl(process.env.SBI_PAYMENT_URL) || `${process.env.API_URL}/api/mock-bank/payment`;
+    let actionUrl = cleanUrl(process.env.SBI_PAYMENT_URL);
     if (actionUrl.includes("sbiepay.sbiuat.bank.in")) {
       actionUrl = `${process.env.API_URL}/api/mock-bank/payment`;
     }
@@ -157,4 +157,24 @@ exports.callback = async (body) => {
 
 exports.getStatus = async (merchantTxnId) => {
   return await Payment.findOne({ where: { merchantTxnId } });
+};
+
+exports.decodeReturnPayload = async (encryptedPayload) => {
+  try {
+    const sbiePayClient = new SBIEPayClient({
+      apiKey: process.env.SBI_MERCHANT_ID,
+      apiSecret: process.env.SBI_MERCHANT_KEY,
+      encryptionKey: process.env.SBI_ENCRYPTION_KEY_BASE64
+    }, 'SANDBOX', true);
+
+    const decoded = await sbiePayClient.crypto.decodeCallback(encryptedPayload);
+    // decodeCallback returns an array, the first element has orderInfo and paymentInfo
+    if (decoded && decoded.length > 0) {
+      return decoded[0];
+    }
+    return null;
+  } catch (error) {
+    console.error("Failed to decode return payload:", error);
+    return null;
+  }
 };

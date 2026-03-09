@@ -6,11 +6,11 @@ const BASE_URL = process.env.API_URL || 'http://localhost:4000/api/payment';
 const params = {
     student_roll: "20J41A0501",
     student_name: "John Doe",
-    amount: 2500,
+    amount: 2500,   
     payment_category: "UNIVERSITY_EXAMINATION",
     semester: "4-1",
     payment_type: "REGULAR",
-    email: "john.doe@example.com",
+    email: "[EMAIL_ADDRESS]",
     mobile: "9876543210",
     // Optional fields for context
     year: "4",
@@ -18,7 +18,7 @@ const params = {
     branch_code: "05",
     branch_name: "CSE",
     college_code: "VV",
-    college_name: "JNTU-GV College of Engineering Vizianagaram (A)"
+    college_name: "JNTU-GV College of Engineering Vizianagaram (Autonomous)"
 };
 
 async function testInitiate() {

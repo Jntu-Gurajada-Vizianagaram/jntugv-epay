@@ -177,7 +177,7 @@ exports.getPaymentStatus = async (req, res) => {
   }
 };
 
-const { decryptData } = require("../utils/secureUrl");
+const { decryptData, encryptData } = require("../utils/secureUrl");
 
 exports.decryptPaymentData = async (req, res) => {
   try {
@@ -188,5 +188,47 @@ exports.decryptPaymentData = async (req, res) => {
   } catch (err) {
     console.error("Decryption Error", err);
     res.status(400).json({ error: "Invalid data" });
+  }
+};
+
+exports.clientReturnHandler = async (req, res) => {
+  const frontendBase = process.env.APP_BASE_URL || "http://localhost:5173";
+  try {
+    const encryptedFinalResponse = req.query.encryptedPaymentFinalResponse;
+
+    if (encryptedFinalResponse) {
+      const decodedPayload = await paymentService.decodeReturnPayload(encryptedFinalResponse);
+      if (decodedPayload && decodedPayload.orderInfo) {
+        const { orderStatus, orderRefNumber, orderAmount } = decodedPayload.orderInfo;
+        const paymentInfoAmount = decodedPayload.paymentInfo ? decodedPayload.paymentInfo.orderAmount : "N/A";
+
+        const payloadData = {
+          merchantTxnId: orderRefNumber,
+          amount: orderAmount || paymentInfoAmount || "N/A",
+          status: (orderStatus || "").toUpperCase()
+        };
+
+        const encrypted = encryptData(payloadData);
+
+        if (payloadData.status === "SUCCESS" || payloadData.status === "PAID") {
+          return res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
+        } else {
+          return res.redirect(`${frontendBase}/payment/failure?data=${encrypted}`);
+        }
+      }
+    }
+
+    const encrypted = encryptData(req.query);
+    const statusStr = (req.query.status || "").toUpperCase();
+    const isFailed = statusStr === "FAIL" || statusStr === "FAILED";
+
+    if (isFailed) {
+      res.redirect(`${frontendBase}/payment/failure?data=${encrypted}`);
+    } else {
+      res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
+    }
+  } catch (err) {
+    console.error("Client Return Error", err);
+    res.redirect(`${frontendBase}/payment/failure?data=${encodeURIComponent(encryptData(req.query))}`);
   }
 };
