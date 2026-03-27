@@ -9,11 +9,14 @@ router.get("/initiate", paymentController.initiatePaymentView);
 router.post("/callback", paymentController.callbackHandler);
 router.post("/sbipush-response", paymentController.callbackHandler);
 router.get("/status/:merchantTxnId", paymentController.getPaymentStatus);
+router.get("/history/:studentRoll", paymentController.getPaymentHistory);
 router.post("/decrypt", paymentController.decryptPaymentData);
 
-// Handle browser return by redirecting to frontend
 router.get("/return", paymentController.clientReturnHandler);
 
 router.get("/payment-response/:merchantTxnId", paymentController.getPaymentStatus);
+
+// Double Verification with SBI
+router.get("/verify-bank/:merchantTxnId", paymentController.verifyWithBank);
 
 module.exports = router;

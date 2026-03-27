@@ -25,6 +25,7 @@ import { AboutUs } from "./pages/AboutUs";
 import { FAQ } from "./pages/FAQ";
 import { TermsAndConditions } from "./pages/TermsAndConditions";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
+import { TransactionHistory } from "./pages/TransactionHistory";
 
 // System / Status pages
 import { ServerError } from "./pages/ServerError";
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/history" element={<TransactionHistory />} />
 
         {/* Payments */}
         <Route path="/payment/return" element={<PaymentReturn />} />

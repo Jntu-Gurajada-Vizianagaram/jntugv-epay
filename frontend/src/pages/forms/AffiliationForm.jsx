@@ -42,6 +42,7 @@ export function AffiliationForm() {
       email: email,
       mobile: mobile,
       amount: Number(amount),
+      payment_category: "AFFILIATION",
       payment_type: "AFFILIATION",
       payment_subtype: category,
       remarks: `Affiliation Fee - ${collegeName} (${code})`,

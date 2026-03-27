@@ -150,13 +150,120 @@ exports.callback = async (body) => {
 
   if (!txn) return;
 
-  txn.status = body.status;
+  const bankStatusMap = {
+    'PAID': 'SUCCESS',
+    'SUCCESS': 'SUCCESS',
+    'FAIL': 'FAILED',
+    'FAILED': 'FAILED',
+    'PENDING': 'PENDING',
+    'ABORTED': 'FAILED',
+    'REFUNDED': 'REFUNDED'
+  };
+
+  const statusStr = (body.status || "").toUpperCase();
+  txn.status = bankStatusMap[statusStr] || 'PENDING';
   txn.bankTxnId = body.bankTxnId;
+  
   await txn.save();
 };
 
+exports.getHistory = async (student_roll) => {
+  return await Payment.findAll({ 
+    where: { student_roll },
+    order: [['createdAt', 'DESC']]
+  });
+};
+
 exports.getStatus = async (merchantTxnId) => {
-  return await Payment.findOne({ where: { merchantTxnId } });
+  const paymentInstance = await Payment.findOne({ where: { merchantTxnId } });
+  if (!paymentInstance) return null;
+
+  const txn = paymentInstance.toJSON();
+
+  // Fetch category-specific details so the receipt has everything
+  const exam = await db.ExamFeeDetail.findOne({ where: { paymentId: txn.transaction_id }, raw: true }) || {};
+  const phd = await db.PhdFeeDetail.findOne({ where: { paymentId: txn.transaction_id }, raw: true }) || {};
+  const cert = await db.CertificateFeeDetail.findOne({ where: { paymentId: txn.transaction_id }, raw: true }) || {};
+  const admission = await db.AdmissionFeeDetail.findOne({ where: { paymentId: txn.transaction_id }, raw: true }) || {};
+  const affiliation = await db.AffiliationFeeDetail.findOne({ where: { paymentId: txn.transaction_id }, raw: true }) || {};
+
+  // Delete duplicate IDs to cleanly merge
+  delete exam.id; delete exam.paymentId;
+  delete phd.id; delete phd.paymentId;
+  delete cert.id; delete cert.paymentId;
+  delete admission.id; delete admission.paymentId;
+  delete affiliation.id; delete affiliation.paymentId;
+
+  return { ...txn, ...exam, ...phd, ...cert, ...admission, ...affiliation };
+};
+
+exports.verifyTransactionWithBank = async (merchantTxnId) => {
+  const sbiePayClient = new SBIEPayClient({
+    apiKey: process.env.SBI_MERCHANT_ID,
+    apiSecret: process.env.SBI_MERCHANT_KEY,
+    encryptionKey: process.env.SBI_ENCRYPTION_KEY_BASE64
+  }, 'SANDBOX', true);
+
+  try {
+    const payload = {
+      orderRefNumber: merchantTxnId
+    };
+    
+    // Order inquiry API
+    const apiResponse = await sbiePayClient.order.transactionOrders(payload);
+    
+    // Check if valid bank response
+    if (apiResponse && apiResponse.status === 1 && apiResponse.data && apiResponse.data.length > 0) {
+      const bankData = apiResponse.data[0];
+      
+      // Update local BD if status changed from bank
+      const txn = await Payment.findOne({ where: { merchantTxnId } });
+      if (txn && bankData.orderStatus) {
+        // Safe mapping of SBI status to DB status
+        const bankStatusMap = {
+          'PAID': 'SUCCESS',
+          'SUCCESS': 'SUCCESS',
+          'FAIL': 'FAILED',
+          'FAILED': 'FAILED',
+          'PENDING': 'PENDING',
+          'ABORTED': 'FAILED',
+          'REFUNDED': 'REFUNDED'
+        };
+        const mappedStatus = bankStatusMap[bankData.orderStatus.toUpperCase()] || txn.status;
+        
+        if (txn.status !== mappedStatus) {
+          txn.status = mappedStatus;
+          if (bankData.paymentInfo && bankData.paymentInfo.paymentRefNumber) {
+            txn.bankTxnId = bankData.paymentInfo.paymentRefNumber;
+          }
+          await txn.save();
+        }
+      }
+
+      return {
+        merchantTxnId,
+        isVerified: true,
+        bankStatus: bankData.orderStatus,
+        bankTxnId: bankData.paymentInfo ? bankData.paymentInfo.paymentRefNumber : null,
+        localDbStatus: txn ? txn.status : null,
+        fullBankResponse: bankData
+      };
+    } else {
+      return { 
+        merchantTxnId, 
+        isVerified: false, 
+        error: "Invalid or empty response from bank.",
+        details: apiResponse.errors
+      };
+    }
+  } catch (error) {
+    console.warn("verifyTransactionWithBank error:", error.message);
+    return {
+      merchantTxnId,
+      isVerified: false,
+      error: "SDK call failed or transaction not found in bank."
+    };
+  }
 };
 
 exports.decodeReturnPayload = async (encryptedPayload) => {

@@ -53,6 +53,7 @@ export function AdmissionsForm() {
       branch: form.branch,
       category: form.category,
       amount: Number(form.amount),
+      payment_category: "ADMISSION",
       payment_type: "ADMISSION",
       payment_subtype: form.course,
       remarks: `New Admission - ${form.course} / ${form.branch}`,
@@ -184,7 +185,6 @@ export function AdmissionsForm() {
               <option>MBA</option>
               <option>MCA</option>
               <option>PHARMA</option>
-
               <option>AIML</option>
               <option>OTHER</option>
             </select>

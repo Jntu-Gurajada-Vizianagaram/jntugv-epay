@@ -177,6 +177,27 @@ exports.getPaymentStatus = async (req, res) => {
   }
 };
 
+exports.getPaymentHistory = async (req, res) => {
+  try {
+    const roll = req.params.studentRoll;
+    const history = await paymentService.getHistory(roll);
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: "Unable to fetch history" });
+  }
+};
+
+exports.verifyWithBank = async (req, res) => {
+  try {
+    const merchantTxnId = req.params.merchantTxnId;
+    const result = await paymentService.verifyTransactionWithBank(merchantTxnId);
+    res.json(result);
+  } catch (err) {
+    console.error("verifyWithBank Error", err);
+    res.status(500).json({ error: "Failed to verify transaction with bank" });
+  }
+};
+
 const { decryptData, encryptData } = require("../utils/secureUrl");
 
 exports.decryptPaymentData = async (req, res) => {
@@ -210,6 +231,13 @@ exports.clientReturnHandler = async (req, res) => {
 
         const encrypted = encryptData(payloadData);
 
+        // Force local DB update just in case callback is delayed
+        await paymentService.callback({
+          merchantTxnId: payloadData.merchantTxnId,
+          status: payloadData.status,
+          bankTxnId: decodedPayload.paymentInfo ? decodedPayload.paymentInfo.paymentRefNumber : "N/A"
+        });
+
         if (payloadData.status === "SUCCESS" || payloadData.status === "PAID") {
           return res.redirect(`${frontendBase}/payment/success?data=${encrypted}`);
         } else {
@@ -221,6 +249,15 @@ exports.clientReturnHandler = async (req, res) => {
     const encrypted = encryptData(req.query);
     const statusStr = (req.query.status || "").toUpperCase();
     const isFailed = statusStr === "FAIL" || statusStr === "FAILED";
+
+    // Force local DB update for mock bank flow
+    if (req.query.merchantTxnId) {
+      await paymentService.callback({
+        merchantTxnId: req.query.merchantTxnId,
+        status: isFailed ? "FAILED" : "SUCCESS",
+        bankTxnId: req.query.bankTxnId || Math.floor(Math.random() * 10000000).toString()
+      });
+    }
 
     if (isFailed) {
       res.redirect(`${frontendBase}/payment/failure?data=${encrypted}`);

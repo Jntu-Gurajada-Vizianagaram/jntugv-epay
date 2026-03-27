@@ -56,6 +56,7 @@ export function Header() {
             <DesktopNav to="/certificates" label="Certificates" />
             <DesktopNav to="/phd-fee" label="Ph.D Fees" />
             <DesktopNav to="/admissions" label="Admissions" />
+            <DesktopNav to="/history" label="History" />
             <DesktopNav to="/about" label="About" />
             <DesktopNav to="/contact" label="Contact" />
           </nav>
@@ -82,13 +83,13 @@ export function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="font-semibold text-lg text-gray-800">Menu</div>
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="text-xl text-gray-700"
-              >
-                ✕
-              </button>
+               <div className="font-semibold text-lg text-gray-800">Menu</div>
+               <button
+                 onClick={() => setMobileOpen(false)}
+                 className="text-xl text-gray-700"
+               >
+                 ✕
+               </button>
             </div>
 
             <MobileNav to="/" label="Home" />
@@ -96,6 +97,7 @@ export function Header() {
             <MobileNav to="/certificates" label="Certificates" />
             <MobileNav to="/phd-fee" label="Ph.D Fees" />
             <MobileNav to="/admissions" label="Admissions" />
+            <MobileNav to="/history" label="History" />
             <MobileNav to="/about" label="About" />
             <MobileNav to="/contact" label="Contact" />
           </div>

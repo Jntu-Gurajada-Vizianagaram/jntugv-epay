@@ -21,6 +21,11 @@ export async function getPaymentStatus(merchantTxnId) {
   return res.data;
 }
 
+export async function getPaymentHistory(studentRoll) {
+  const res = await apiClient.get(`/api/payment/history/${studentRoll}`);
+  return res.data;
+}
+
 export async function mockBankCallback(callbackData) {
   const res = await apiClient.post("/api/payment/callback", callbackData);
   return res.data;

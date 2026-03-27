@@ -39,9 +39,9 @@ export function parseHTNumber(ht = "") {
   // ([A-Z0-9]{2})    -> College Code (VV, U4, etc)
   // ([A-Z0-9])       -> Course Code (1=B.Tech, 5=Lateral, etc)
   // ([A-Z])          -> Admission Type (A=Regular, D=Diploma, etc)
-  // ([0-9]{2})       -> Branch Code (12, 05, etc)
-  // ([0-9]{2,4})     -> Roll Number (03, 1273)
-  const regex = /^([0-9]{2})([A-Z0-9]{2})([A-Z0-9])([A-Z])([0-9]{2})([0-9]{2,4})$/;
+  // ([A-Z0-9]{2})    -> Branch Code (12, CS, etc)
+  // ([A-Z0-9]{2,4})  -> Roll Number (03, 1273)
+  const regex = /^([0-9]{2})([A-Z0-9]{2})([A-Z0-9])([A-Z])([A-Z0-9]{2})([A-Z0-9]{2,4})$/;
 
   const m = s.match(regex);
   if (!m) return { valid: false, error: "Invalid Hallticket Format" };
@@ -152,6 +152,7 @@ function detectCourse(branchCode, courseCode, typeCode) {
   if (code === "1S") return "M.Pharmacy";
   if (code === "1E") return "MBA";
   if (code === "1F") return "MCA";
+  if (code === "1R") return "Ph.D Program";
 
   if (typeCode === "S") return "MCA";
   if (typeCode === "M") return "MBA";
